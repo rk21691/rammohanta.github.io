@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ram Krushna Mohanta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: the lab half reads like an instrument readout on cool paper; the outdoors half is a
+     forest-green contour map. One loud element: the live emission spectrum under the name. */
+  --paper:#F2F4F6;
+  --panel:#E5E9ED;
+  --ink:#17212B;
+  --muted:#55616D;
+  --rule:#CBD2D9;
+  --halpha:#C4162F;   /* H-alpha, 656 nm */
+  --balmer:#16708F;   /* H-beta, 486 nm */
+  --melt:#E8862A;     /* liquid metal, diagram only */
+  --forest:#1D3A29;
+  --forest-ink:#EEF3EA;
+  --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed","Helvetica Neue Condensed",Impact,sans-serif;
+  --body:"Spectral","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --wrap:1120px;
+  --gutter:clamp(16px,4vw,40px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#0F161D; --panel:#18222C; --ink:#E4EAF0; --muted:#94A1AD; --rule:#27333E;
+    --halpha:#FF6B74; --balmer:#6CCBE8; --melt:#F29A3F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0F161D; --panel:#18222C; --ink:#E4EAF0; --muted:#94A1AD; --rule:#27333E;
+  --halpha:#FF6B74; --balmer:#6CCBE8; --melt:#F29A3F;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:18px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg,canvas{max-width:100%}
+p{margin:0}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:700;line-height:1;text-wrap:balance}
+a{color:var(--balmer);text-decoration-thickness:1px;text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--halpha);outline-offset:3px;border-radius:2px}
+sub,sup{line-height:0}
+.wrap{width:100%;max-width:calc(var(--wrap) + 2*var(--gutter));margin-inline:auto;padding-inline:var(--gutter)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:8px 14px;z-index:20}
+.skip:focus{left:8px}
+
+/* Top bar */
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 90%,transparent);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.top-inner{display:flex;align-items:center;gap:8px 28px;min-height:56px}
+.top-name{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.01em;color:var(--ink);
+  text-decoration:none;white-space:nowrap}
+.top-links{display:flex;gap:22px;margin-left:auto;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.top-links::-webkit-scrollbar{display:none}
+.top-links a{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.03em;color:var(--ink);
+  text-decoration:none;padding:16px 0}
+.top-links a:hover{color:var(--halpha)}
+@media (max-width:760px){
+  .top-inner{flex-direction:column;align-items:flex-start;gap:0;padding-top:10px}
+  .top-links{margin-left:0;width:100%;gap:18px}
+  .top-links a{padding:8px 0 12px}
+}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:minmax(0,max-content) minmax(17rem,1fr);gap:24px 56px;align-items:end;
+  padding-top:clamp(40px,7vw,88px);padding-bottom:clamp(24px,3vw,36px)}
+.hero h1{font-weight:800;font-size:clamp(68px,13.2vw,172px);line-height:.86;letter-spacing:-.005em}
+.hero-text{display:grid;gap:16px;padding-bottom:6px;max-width:26rem;justify-self:end}
+@media (max-width:900px){.hero-text{justify-self:start}}
+.lede{font-size:clamp(20px,2vw,23px);line-height:1.42}
+.role{color:var(--muted);font-size:17px;line-height:1.45}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+
+.spectrum{margin:0 auto;padding-bottom:clamp(40px,6vw,72px)}
+.spectrum-band{background:#0A1118;border-radius:6px;overflow:hidden}
+#spectrum{display:block;width:100%;height:clamp(210px,26vw,300px)}
+figcaption{color:var(--muted);font-size:15.5px;line-height:1.5;margin-top:10px;max-width:68ch}
+
+/* Sections */
+.section{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px 48px;
+  padding-block:clamp(44px,6vw,76px);border-top:1px solid var(--rule)}
+.section > h2{font-size:42px;align-self:start;position:sticky;top:80px;scroll-margin-top:80px}
+.section,.band{scroll-margin-top:56px}
+.body{display:grid;gap:36px;min-width:0}
+.body > *{min-width:0}
+.prose{display:grid;gap:14px;max-width:66ch}
+@media (max-width:900px){
+  .section{grid-template-columns:1fr}
+  .section > h2{position:static;font-size:38px}
+  .section,.band{scroll-margin-top:92px}
+}
+
+/* About */
+.about{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:28px 40px;align-items:start}
+@media (max-width:700px){.about{grid-template-columns:1fr}.about .slot{max-width:260px}}
+.path{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--rule)}
+.path li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 24px;padding:16px 0;border-bottom:1px solid var(--rule)}
+.path .when{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.15;color:var(--halpha)}
+.path strong{font-weight:600}
+.path span{display:block;color:var(--muted);font-size:16.5px}
+@media (max-width:520px){.path li{grid-template-columns:1fr}}
+
+/* Research */
+.themes{display:grid;gap:30px}
+.theme{display:grid;grid-template-columns:250px minmax(0,1fr);gap:8px 32px;align-items:start}
+.theme h3{font-size:29px;line-height:1.02}
+.theme p{max-width:60ch}
+.theme .also{margin-top:8px;color:var(--muted);font-style:italic;font-size:16.5px}
+@media (max-width:700px){.theme{grid-template-columns:1fr}}
+
+.diagram{margin:0;padding:24px 0 0;border-top:1px solid var(--rule)}
+.diagram h3{font-size:29px;margin-bottom:14px}
+.diagram-scroll{overflow-x:auto}
+.diagram svg{display:block;width:100%;min-width:540px;max-width:720px;height:auto;color:var(--ink)}
+.d-line{fill:none;stroke:currentColor;stroke-width:1.25}
+.d-lead{fill:none;stroke:currentColor;stroke-width:1;opacity:.5}
+.d-solid{fill:currentColor}
+.d-mantle{fill:currentColor;fill-opacity:.07;stroke:currentColor;stroke-opacity:.45;stroke-width:1;stroke-dasharray:4 4}
+.d-core{fill:currentColor;fill-opacity:.17;stroke:currentColor;stroke-opacity:.6;stroke-width:1}
+.d-bl{fill:var(--balmer);fill-opacity:.22;stroke:var(--balmer);stroke-width:1.25}
+.d-block{fill:currentColor;fill-opacity:.06;stroke:currentColor;stroke-width:1.25}
+.d-melt{fill:var(--melt)}
+.d-ion{fill:none;stroke:var(--halpha);stroke-width:2;stroke-dasharray:5 4}
+.d-neutral{fill:none;stroke:var(--halpha);stroke-width:2}
+.d-accent{fill:var(--halpha)}
+.d-t{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.02em;fill:currentColor}
+.d-s{font-family:var(--body);font-style:italic;font-size:13px;fill:currentColor;opacity:.75}
+.d-sp{font-family:var(--display);font-weight:800;font-size:17px;fill:var(--halpha)}
+
+/* Lab */
+.plates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+@media (max-width:700px){.plates{grid-template-columns:1fr}}
+.plate{border:2px solid var(--ink);border-radius:3px;background:var(--paper)}
+.plate h3{background:var(--ink);color:var(--paper);font-size:23px;letter-spacing:.02em;padding:10px 16px 9px}
+.plate p.origin{padding:12px 16px 0;color:var(--muted);font-size:15.5px;font-style:italic}
+.plate dl{margin:0;padding:8px 16px 12px}
+.plate dl > div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.plate dl > div:last-child{border-bottom:0}
+.plate dt{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.03em;color:var(--muted);line-height:1.5}
+.plate dd{margin:0;font-size:16.5px;line-height:1.45;font-variant-numeric:tabular-nums}
+
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+@media (max-width:520px){.slots{grid-template-columns:1fr}}
+.slot{margin:0}
+.slot-frame{aspect-ratio:4/3;border:1.5px dashed var(--muted);border-radius:4px;background:var(--panel);
+  display:grid;place-items:center;text-align:center;padding:16px}
+.slot-frame.tall{aspect-ratio:4/5}
+.slot-frame span{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.04em;color:var(--muted)}
+.slot figcaption{margin-top:8px}
+.photo{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:4px;background:var(--panel)}
+.reels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.reel{margin:0}
+.reel.wide{grid-column:1 / -1}
+.reel video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#05080B;border-radius:4px}
+.reel.wide video{aspect-ratio:21/9;object-position:50% 45%}
+.reel figcaption strong{color:var(--ink);font-weight:600}
+@media (max-width:600px){.reels{grid-template-columns:1fr}.reel.wide video{aspect-ratio:4/3}}
+
+/* Publications and conferences */
+.pubs{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.pub{display:grid;grid-template-columns:72px minmax(0,1fr);gap:4px 24px;padding:22px 0;border-bottom:1px solid var(--rule)}
+.pub-year{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.1;color:var(--halpha);font-variant-numeric:tabular-nums}
+.pub h3{font-family:var(--body);font-weight:600;font-size:20px;line-height:1.32;text-wrap:pretty;max-width:60ch}
+.pub-main{display:grid;gap:6px;min-width:0}
+.pub-authors,.pub-venue{font-size:16.5px;line-height:1.5;max-width:66ch}
+.pub-authors{color:var(--muted)}
+.pub-authors b{color:var(--ink);font-weight:600}
+.pub-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin-top:4px;font-size:16.5px}
+.copy{font:inherit;font-size:15.5px;color:var(--ink);background:transparent;border:1px solid var(--muted);
+  border-radius:3px;padding:3px 10px;cursor:pointer}
+.copy:hover{border-color:var(--ink);background:var(--panel)}
+.after-list{color:var(--muted);font-size:16.5px;max-width:66ch}
+@media (max-width:520px){.pub{grid-template-columns:1fr}}
+
+/* Notes */
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 48px}
+@media (max-width:760px){.notes{grid-template-columns:1fr}}
+.note{display:grid;gap:10px;align-content:start;border-top:3px solid var(--ink);padding-top:14px}
+.note h3{font-size:33px;line-height:1}
+.note .src{font-size:15.5px;color:var(--muted)}
+
+/* Outdoors band: one committed world, same in both themes */
+.band{position:relative;background:var(--forest);color:var(--forest-ink);overflow:hidden}
+#topo{position:absolute;inset:0;width:100%;height:100%;display:block}
+.band-inner{position:relative;display:grid;gap:36px;padding-block:clamp(56px,8vw,104px)}
+.band h2{font-weight:800;font-size:clamp(56px,9vw,112px);line-height:.88}
+.band .prose{font-size:clamp(20px,2vw,23px);line-height:1.42;max-width:34ch}
+.trio{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+@media (max-width:960px){.trio{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.trio{grid-template-columns:1fr;max-width:420px}}
+.band .slot-frame{background:rgba(10,26,16,.55);border-color:rgba(238,243,234,.55)}
+.band .slot-frame span{color:rgba(238,243,234,.8)}
+.band .slot h3{font-size:30px;margin-top:14px}
+.band .slot figcaption{color:rgba(238,243,234,.82);font-size:17px;margin-top:6px}
+
+/* Contact */
+.find{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.find a{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,52px);line-height:1.08;color:var(--ink);
+  text-decoration:none;border-bottom:3px solid var(--halpha)}
+.find a:hover{color:var(--halpha)}
+.section.last{border-top:0}
+footer{border-top:1px solid var(--rule);color:var(--muted);font-size:15.5px}
+footer .wrap{padding-block:22px 34px}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#about">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="top-name" href="#top">Ram Krushna Mohanta</a>
+    <nav class="top-links" aria-label="Sections">
+      <a href="#research">Research</a>
+      <a href="#lab">Lab</a>
+      <a href="#publications">Publications</a>
+      <a href="#conferences">Conferences</a>
+      <a href="#notes">Notes</a>
+      <a href="#outdoors">Outdoors</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="wrap hero">
+    <h1>Ram Krushna<br>Mohanta</h1>
+    <div class="hero-text">
+      <p class="lede">I build plasma reactors, then read the light they give off. I want to know how hydrogen pulls oxygen out of molten ore, and which species does the work.</p>
+      <p class="role">Postdoctoral Fellow at Missouri University of Science and Technology, Rolla, Missouri. Now working on plasma-based recovery of critical minerals from spent lithium-ion batteries and rare earth magnets.</p>
+    </div>
+  </div>
+
+  <figure class="wrap spectrum">
+    <div class="spectrum-band">
+      <canvas id="spectrum" role="img" aria-label="Emission spectrum from 390 to 860 nanometres with hydrogen Balmer lines, iron lines and argon lines marked."></canvas>
+    </div>
+    <figcaption>A hydrogen and argon arc over molten iron, the way a spectrometer sees it. Line positions are real. Intensities are illustrative.</figcaption>
+  </figure>
+
+  <section class="wrap section" id="about">
+    <h2>About</h2>
+    <div class="body">
+      <div class="about">
+        <div class="prose">
+          <p>I am a postdoctoral fellow at Missouri University of Science and Technology. I work where thermal plasma meets high-temperature metallurgy.</p>
+          <p>Right now I am using plasma processing to recover critical minerals from spent lithium-ion batteries and rare earth magnets.</p>
+          <p>My training is in plasma engineering. I spent my PhD at the Institute for Plasma Research building and diagnosing DC plasma torches for low-pressure spraying. Since then I have pointed the same tools at a different problem: getting metal out of its oxide with hydrogen.</p>
+          <p>Before Missouri I was a postdoctoral researcher at Arizona State University, in the group of Prof. Seetharaman Sridhar.</p>
+        </div>
+        <figure class="slot">
+          <img class="photo tall" src="media/portrait.jpg" alt="Portrait of Ram Krushna Mohanta" width="900" height="1005">
+        </figure>
+      </div>
+      <ul class="path">
+        <li><div class="when">Now</div><div><strong>Postdoctoral Fellow, Missouri University of Science and Technology</strong><span>Rolla, Missouri. Since September 2026. Plasma recovery of critical minerals from spent lithium-ion batteries and rare earth magnets.</span></div></li>
+        <li><div class="when">Before</div><div><strong>Postdoctoral Researcher, Arizona State University</strong><span>Group of Prof. Seetharaman Sridhar. Until September 2026.</span></div></li>
+        <li><div class="when">PhD</div><div><strong>Homi Bhabha National Institute, at the Institute for Plasma Research, India</strong><span>Thesis on thermal plasma jets for low-pressure plasma spraying.</span></div></li>
+        <li><div class="when">M.Tech</div><div><strong>Delhi Technological University</strong><span>Vice Chancellor's Gold Medal.</span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap section" id="research">
+    <h2>Research</h2>
+    <div class="body">
+      <div class="themes">
+        <article class="theme">
+          <h3>Critical minerals from waste</h3>
+          <div>
+            <p>My current work at Missouri S&amp;T. I use plasma processing to recover critical metals from spent lithium-ion batteries and from rare earth magnets. The same arc that strips oxygen from iron ore can pull valuable metals out of the waste stream.</p>
+            <p class="also">Spent Li-ion battery black mass, rare earth magnets.</p>
+          </div>
+        </article>
+        <article class="theme">
+          <h3>Hydrogen plasma smelting reduction</h3>
+          <div>
+            <p>One step from ore to liquid iron. A hydrogen arc does the heating and the chemistry at once. I study the plasma and melt interface, because that thin layer sets the reduction rate.</p>
+            <p class="also">Transferred arcs, argon and hydrogen atmospheres, liquid oxide melts.</p>
+          </div>
+        </article>
+        <article class="theme">
+          <h3>Plasma diagnostics</h3>
+          <div>
+            <p>Optical emission spectroscopy, infrared thermography and plain electrical measurements. Used together, they map temperature and species through the arc and track metallization while it happens.</p>
+            <p class="also">Emission spectroscopy, infrared thermography, arc voltage signatures.</p>
+          </div>
+        </article>
+        <article class="theme">
+          <h3>Hydrogen reduction across the melting range</h3>
+          <div>
+            <p>Iron ore reduction with hydrogen from 900 to 1590&nbsp;°C. Solid, mixed and fully liquid. The rate does not climb smoothly with temperature, and the reason matters for process design.</p>
+            <p class="also">Solid state through to liquid slag.</p>
+          </div>
+        </article>
+        <article class="theme">
+          <h3>Plasma torch and reactor engineering</h3>
+          <div>
+            <p>DC arc and RF plasma reactors, designed and characterized from the electrode up. My PhD covered low-pressure DC plasma spray torches from 1 to 30&nbsp;mbar, with similarity theory to predict how a torch behaves. A product patent on a DC plasma spray torch is under review.</p>
+            <p class="also">DC torches, RF plasma, thermal spray coatings, vacuum systems.</p>
+          </div>
+        </article>
+        <article class="theme">
+          <h3>Beyond iron</h3>
+          <div>
+            <p>Reduction of aluminum, magnesium and titanium oxides. Hydrogen generation by methane pyrolysis.</p>
+          </div>
+        </article>
+      </div>
+
+      <figure class="diagram">
+        <h3>Inside a hydrogen arc</h3>
+        <div class="diagram-scroll">
+          <svg viewBox="0 0 640 420" role="img" aria-label="Schematic of a transferred hydrogen arc. Hydrogen ions recombine in a cool boundary layer above the melt, while neutral atomic hydrogen and excited hydrogen molecules reach the melt.">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 Z" class="d-accent"/>
+              </marker>
+            </defs>
+            <!-- cathode -->
+            <rect x="182" y="14" width="36" height="96" class="d-solid"/>
+            <polygon points="182,110 218,110 205,142 195,142" class="d-solid"/>
+            <!-- arc layers -->
+            <path d="M194 142 C176 190 104 250 86 292 L314 292 C296 250 224 190 206 142 Z" class="d-mantle"/>
+            <path d="M197 142 C191 190 160 245 152 284 L248 284 C240 245 209 190 203 142 Z" class="d-core"/>
+            <!-- crucible, melt, boundary layer -->
+            <rect x="28" y="308" width="344" height="92" rx="3" class="d-block"/>
+            <path d="M70 308 L330 308 C322 340 270 352 200 352 C130 352 78 340 70 308 Z" class="d-melt"/>
+            <rect x="78" y="292" width="244" height="16" class="d-bl"/>
+            <circle cx="88" cy="380" r="8" class="d-line"/>
+            <circle cx="200" cy="380" r="8" class="d-line"/>
+            <circle cx="312" cy="380" r="8" class="d-line"/>
+            <!-- species -->
+            <text x="116" y="232" text-anchor="middle" class="d-sp">H⁺</text>
+            <line x1="116" y1="240" x2="116" y2="297" class="d-ion"/>
+            <line x1="108" y1="300" x2="124" y2="300" class="d-neutral"/>
+            <text x="284" y="232" text-anchor="middle" class="d-sp">H, H₂*</text>
+            <line x1="284" y1="240" x2="284" y2="322" class="d-neutral" marker-end="url(#ah)"/>
+            <!-- labels -->
+            <line x1="166" y1="60" x2="182" y2="60" class="d-lead"/>
+            <text x="160" y="65" text-anchor="end" class="d-t">Tungsten cathode</text>
+            <line x1="210" y1="188" x2="388" y2="188" class="d-lead"/>
+            <text x="396" y="186" class="d-t">Argon-rich core</text>
+            <text x="396" y="203" class="d-s">hottest part of the arc</text>
+            <line x1="302" y1="262" x2="388" y2="262" class="d-lead"/>
+            <text x="396" y="260" class="d-t">Hydrogen-rich mantle</text>
+            <text x="396" y="277" class="d-s">cooler</text>
+            <line x1="322" y1="300" x2="388" y2="300" class="d-lead"/>
+            <text x="396" y="305" class="d-t">Boundary layer</text>
+            <text x="396" y="322" class="d-s">coolest, ions recombine here</text>
+            <line x1="296" y1="342" x2="388" y2="342" class="d-lead"/>
+            <text x="396" y="347" class="d-t">Liquid melt</text>
+            <line x1="372" y1="384" x2="388" y2="384" class="d-lead"/>
+            <text x="396" y="389" class="d-t">Water-cooled copper crucible</text>
+          </svg>
+        </div>
+        <figcaption>The arc is layered, not uniform. Positive hydrogen ions recombine in the cool boundary layer above the melt. Neutral atomic hydrogen and vibrationally excited H<sub>2</sub> are what reach the oxide. Schematic of the finding in <a href="https://arxiv.org/abs/2607.06840">arXiv:2607.06840</a>. Not to scale.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap section" id="lab">
+    <h2>In the lab</h2>
+    <div class="body">
+      <div class="prose">
+        <p>A typical run starts with a few grams of ore on a cold copper hearth and a tungsten tip above it. Strike the arc, then watch everything at once: the light, the heat, the voltage.</p>
+      </div>
+      <div class="plates">
+        <section class="plate">
+          <h3>Transferred arc, hydrogen plasma</h3>
+          <dl>
+            <div><dt>Sample</dt><dd>10 g hematite ore, direct-reduction grade</dd></div>
+            <div><dt>Hearth</dt><dd>Water-cooled copper crucible</dd></div>
+            <div><dt>Electrode</dt><dd>Tungsten</dd></div>
+            <div><dt>Atmosphere</dt><dd>Argon with 5% H<sub>2</sub> at 0.9 bar</dd></div>
+            <div><dt>Arc current</dt><dd>100 to 200 A</dd></div>
+            <div><dt>Watched with</dt><dd>Emission spectroscopy, infrared thermography, arc voltage</dd></div>
+          </dl>
+        </section>
+        <section class="plate">
+          <h3>Low-pressure DC spray torch</h3>
+          <dl>
+            <div><dt>Where</dt><dd>Institute for Plasma Research, PhD work</dd></div>
+            <div><dt>Chamber</dt><dd>1 to 30 mbar</dd></div>
+            <div><dt>Plasma gas</dt><dd>Nitrogen, 24 to 64 L/min</dd></div>
+            <div><dt>Jet</dt><dd>Supersonic until the Mach disk, subsonic after it</dd></div>
+            <div><dt>Watched with</dt><dd>Current and voltage curves, high-speed imaging, emission spectroscopy, Mach probe</dd></div>
+          </dl>
+        </section>
+      </div>
+      <div class="reels">
+        <figure class="reel wide">
+          <video src="media/arc-hydrogen.mp4" poster="media/arc-hydrogen.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Hydrogen plasma arc over a molten ore sample"></video>
+          <figcaption><strong>Hydrogen plasma arc for smelting reduction.</strong> The arc runs from the tungsten tip down to the molten ore.</figcaption>
+        </figure>
+        <figure class="reel">
+          <video src="media/jet-supersonic.mp4" poster="media/jet-supersonic.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Supersonic nitrogen plasma jet in a low-pressure chamber"></video>
+          <figcaption><strong>Supersonic plasma jet.</strong> Nitrogen, 30 kW, 500 A, at 1 mbar chamber pressure.</figcaption>
+        </figure>
+        <figure class="reel">
+          <video src="media/torch-atmospheric.mp4" poster="media/torch-atmospheric.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Atmospheric plasma torch firing in open air"></video>
+          <figcaption><strong>Atmospheric plasma torch.</strong> 30 kW, firing in open air.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="publications">
+    <h2>Publications</h2>
+    <div class="body">
+      <ol class="pubs">
+        <li class="pub">
+          <div class="pub-year">2026</div>
+          <div class="pub-main">
+            <h3>Electrical and Spectroscopic Diagnostics as Real-Time Metallization Indicators During Hydrogen Plasma Smelting Reduction</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b>, G. de los Reyes Castillo, S. V. Korsipati, Y. Korobeinikov, H. Sitaraman, L. Raja, N. Leick, S. Sridhar</p>
+            <p class="pub-venue"><i>Advanced Sustainable Systems</i> (2026)</p>
+            <p class="pub-actions"><a href="https://doi.org/10.1002/adsu.202501578">doi.org/10.1002/adsu.202501578</a>
+              <button type="button" class="copy" id="copy-adsu" data-cite="R. K. Mohanta, G. de los Reyes Castillo, S. V. Korsipati, Y. Korobeinikov, H. Sitaraman, L. Raja, N. Leick, S. Sridhar, &quot;Electrical and Spectroscopic Diagnostics as Real-Time Metallization Indicators During Hydrogen Plasma Smelting Reduction,&quot; Advanced Sustainable Systems (2026). https://doi.org/10.1002/adsu.202501578">Copy citation</button></p>
+          </div>
+        </li>
+        <li class="pub">
+          <div class="pub-year">2026</div>
+          <div class="pub-main">
+            <h3>Spatiotemporal Dynamics of Hydrogen Plasma Smelting Reduction of iron ore: A Multi-Species Diagnostic Approach</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b>, K. Lopez, S. V. Korsipati, H. Sitaraman, L. Raja, N. Leick, S. Sridhar</p>
+            <p class="pub-venue">Preprint, arXiv:2607.06840 (2026)</p>
+            <p class="pub-actions"><a href="https://arxiv.org/abs/2607.06840">arxiv.org/abs/2607.06840</a>
+              <button type="button" class="copy" id="copy-arxiv" data-cite="R. K. Mohanta, K. Lopez, S. V. Korsipati, H. Sitaraman, L. Raja, N. Leick, S. Sridhar, &quot;Spatiotemporal Dynamics of Hydrogen Plasma Smelting Reduction of iron ore: A Multi-Species Diagnostic Approach,&quot; arXiv:2607.06840 (2026). https://arxiv.org/abs/2607.06840">Copy citation</button></p>
+          </div>
+        </li>
+        <li class="pub">
+          <div class="pub-year">2025</div>
+          <div class="pub-main">
+            <h3>Bridging the Gap in Carbon Free Iron Making: How Hydrogen Affects the Reduction of Iron Ore between 900 and 1590&nbsp;°C</h3>
+            <p class="pub-authors"><b>R. Mohanta</b>, D. Fisher, Y. Korobeinikov, Q. Hong, C. Muhich, S. Seetharaman, N. Leick</p>
+            <p class="pub-venue"><i>ACS Sustainable Chemistry &amp; Engineering</i> 13 (42), 17726–17732 (2025)</p>
+            <p class="pub-actions"><a href="https://research-hub.nrel.gov/en/publications/bridging-the-gap-in-carbon-free-iron-making-how-hydrogen-affects-/">Publication record</a>
+              <button type="button" class="copy" id="copy-acs" data-cite="R. Mohanta, D. Fisher, Y. Korobeinikov, Q. Hong, C. Muhich, S. Seetharaman, N. Leick, &quot;Bridging the Gap in Carbon Free Iron Making: How Hydrogen Affects the Reduction of Iron Ore between 900 and 1590 °C,&quot; ACS Sustainable Chemistry &amp; Engineering 13 (42), 17726–17732 (2025).">Copy citation</button></p>
+          </div>
+        </li>
+        <li class="pub">
+          <div class="pub-year">2023</div>
+          <div class="pub-main">
+            <h3>Effect of chamber pressure on the output characteristics of a low-pressure DC plasma torch</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b>, D. Kumawat, G. Ravi</p>
+            <p class="pub-venue"><i>Journal of Applied Physics</i> 134, 153302 (2023)</p>
+            <p class="pub-actions"><a href="https://pubs.aip.org/aip/jap/article-abstract/134/15/153302/2916968/Effect-of-chamber-pressure-on-the-output">Article at AIP Publishing</a>
+              <button type="button" class="copy" id="copy-jap" data-cite="R. K. Mohanta, D. Kumawat, G. Ravi, &quot;Effect of chamber pressure on the output characteristics of a low-pressure DC plasma torch,&quot; Journal of Applied Physics 134, 153302 (2023).">Copy citation</button></p>
+          </div>
+        </li>
+        <li class="pub">
+          <div class="pub-year">2023</div>
+          <div class="pub-main">
+            <h3>Application of similarity theory to predict operational characteristics of a DC plasma torch under low-pressure condition</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b>, D. Kumawat, G. Ravi, K. Tahiliani</p>
+            <p class="pub-venue"><i>The European Physical Journal D</i> 77, 89 (2023)</p>
+            <p class="pub-actions"><a href="https://doi.org/10.1140/epjd/s10053-023-00677-7">doi.org/10.1140/epjd/s10053-023-00677-7</a>
+              <button type="button" class="copy" id="copy-epjd" data-cite="R. K. Mohanta, D. Kumawat, G. Ravi, K. Tahiliani, &quot;Application of similarity theory to predict operational characteristics of a DC plasma torch under low-pressure condition,&quot; The European Physical Journal D 77, 89 (2023). https://doi.org/10.1140/epjd/s10053-023-00677-7">Copy citation</button></p>
+          </div>
+        </li>
+        <li class="pub">
+          <div class="pub-year">2023</div>
+          <div class="pub-main">
+            <h3>Investigation of thermal plasma jet for low pressure plasma spraying</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b></p>
+            <p class="pub-venue">PhD thesis, Homi Bhabha National Institute (2023)</p>
+            <p class="pub-actions"><a href="http://hdl.handle.net/10603/583513">hdl.handle.net/10603/583513</a>
+              <button type="button" class="copy" id="copy-thesis" data-cite="R. K. Mohanta, &quot;Investigation of thermal plasma jet for low pressure plasma spraying,&quot; PhD thesis, Homi Bhabha National Institute (2023). http://hdl.handle.net/10603/583513">Copy citation</button></p>
+          </div>
+        </li>
+        <li class="pub">
+          <div class="pub-year">2022</div>
+          <div class="pub-main">
+            <h3>Investigation of Subsonic to Supersonic Transition of a Low-Pressure Plasma Torch Jet</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b>, G. Ravi</p>
+            <p class="pub-venue"><i>IEEE Transactions on Plasma Science</i> 50 (9), 2941–2951 (2022)</p>
+            <p class="pub-actions"><a href="https://doi.org/10.1109/TPS.2022.3195448">doi.org/10.1109/TPS.2022.3195448</a>
+              <button type="button" class="copy" id="copy-tps" data-cite="R. K. Mohanta, G. Ravi, &quot;Investigation of Subsonic to Supersonic Transition of a Low-Pressure Plasma Torch Jet,&quot; IEEE Transactions on Plasma Science 50 (9), 2941–2951 (2022). https://doi.org/10.1109/TPS.2022.3195448">Copy citation</button></p>
+          </div>
+        </li>
+      </ol>
+      <p class="after-list">Patent: a product patent for a DC plasma spray torch is under review.</p>
+    </div>
+  </section>
+
+  <section class="wrap section" id="conferences">
+    <h2>Conferences</h2>
+    <div class="body">
+      <ol class="pubs">
+        <li class="pub">
+          <div class="pub-year">2022</div>
+          <div class="pub-main">
+            <h3>Investigation of the electro-thermal dynamics of a low pressure DC plasma spray torch</h3>
+            <p class="pub-authors"><b>R. K. Mohanta</b>, G. Ravi</p>
+            <p class="pub-venue">Oral talk, 75th Annual Gaseous Electronics Conference. Sendai, Japan, 6 October 2022.</p>
+            <p class="pub-actions"><a href="https://meetings.aps.org/Meeting/GEC22/Session/ER1.2">Abstract in the APS bulletin</a></p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap section" id="notes">
+    <h2>Notes on plasma</h2>
+    <div class="body">
+      <div class="prose"><p>Short takes. Each one is tied to a paper.</p></div>
+      <div class="notes">
+        <article class="note">
+          <h3>The arc is not a uniform heater.</h3>
+          <p>Most process models treat the arc as one hot, even source. It is not. Our measurements show layers: a very hot argon core, a cooler hydrogen-rich mantle and a comparatively cool boundary layer sitting on the melt. The chemistry is decided in that last layer.</p>
+          <p class="src">From <a href="https://arxiv.org/abs/2607.06840">arXiv:2607.06840</a></p>
+        </article>
+        <article class="note">
+          <h3>Ions get the attention. Neutrals do the work.</h3>
+          <p>Positive hydrogen ions recombine before they reach the melt surface. What arrives at the oxide is mostly neutral atomic hydrogen and vibrationally excited H<sub>2</sub>, not energetic ions.</p>
+          <p class="src">From <a href="https://arxiv.org/abs/2607.06840">arXiv:2607.06840</a></p>
+        </article>
+        <article class="note">
+          <h3>Your power supply is already a sensor.</h3>
+          <p>Arc voltage drops sharply as metallization nears 95%. Metallic iron makes the sample conductive, and iron vapor makes the arc itself more conductive. You can watch reduction finish on a voltmeter.</p>
+          <p class="src">From <a href="https://doi.org/10.1002/adsu.202501578"><i>Advanced Sustainable Systems</i> (2026)</a></p>
+        </article>
+        <article class="note">
+          <h3>Hotter is not always faster.</h3>
+          <p>In 20 minutes of hydrogen, reduction climbs from about 35% at 900&nbsp;°C to over 90% at 1550&nbsp;°C. Between 1100 and 1400&nbsp;°C it stalls near 60%. Temperature alone does not buy you rate.</p>
+          <p class="src">From <a href="https://research-hub.nrel.gov/en/publications/bridging-the-gap-in-carbon-free-iron-making-how-hydrogen-affects-/"><i>ACS Sustainable Chemistry &amp; Engineering</i> (2025)</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="outdoors">
+    <canvas id="topo" aria-hidden="true"></canvas>
+    <div class="wrap band-inner">
+      <h2>Out of the lab</h2>
+      <div class="prose"><p>When I am not doing science, I am outside. I hike, camp, fish and ride.</p></div>
+      <div class="trio">
+        <figure class="slot">
+          <img class="photo" src="media/hiking.jpg" alt="Ram standing on a rock at a summit above a desert city" width="1100" height="1956" style="object-position:40% 72%">
+          <h3>Hiking</h3>
+          <figcaption>Long walks with elevation, and a view at the top.</figcaption>
+        </figure>
+        <figure class="slot">
+          <img class="photo" src="media/camping.jpg" alt="The Milky Way over the Grand Canyon at night" width="1100" height="1990" style="object-position:55% 50%">
+          <h3>Camping</h3>
+          <figcaption>Overnight at the Grand Canyon. The Milky Way, straight overhead.</figcaption>
+        </figure>
+        <figure class="slot">
+          <img class="photo" src="media/fishing.jpg" alt="Ram by a clear river holding up a trout on a stringer" width="1100" height="1950" style="object-position:55% 58%">
+          <h3>Fishing</h3>
+          <figcaption>A lot like experiments. Long waits, then everything at once.</figcaption>
+        </figure>
+        <figure class="slot">
+          <img class="photo" src="media/riding.jpg" alt="Ram in a riding jacket sitting on a blue sport motorcycle" width="1100" height="1461" style="object-position:50% 50%">
+          <h3>Riding</h3>
+          <figcaption>Two wheels, open road.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section last" id="contact">
+    <h2>Find me</h2>
+    <div class="body">
+      <ul class="find">
+        <li><a href="https://scholar.google.co.in/citations?hl=en&amp;user=tuNs4JAAAAAJ">Google Scholar</a></li>
+        <li><a href="https://www.linkedin.com/in/rammohanta21/">LinkedIn</a></li>
+        <li><a href="https://www.researchgate.net/profile/Ram-Mohanta">ResearchGate</a></li>
+      </ul>
+      <div class="prose"><p>Missouri University of Science and Technology, Rolla, Missouri, USA.</p></div>
+    </div>
+  </section>
+
+</main>
+
+<footer><div class="wrap">Ram Krushna Mohanta. Last updated November 2026.</div></footer>
+
+<script>
+/* Live emission spectrum. Real line positions (nm); relative intensities are illustrative. */
+(function () {
+  var cv = document.getElementById('spectrum');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var L0 = 388, L1 = 858, W = 0, H = 0, dpr = 1;
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var FONT = '"Big Shoulders Display","Arial Narrow",sans-serif';
+  var lines = [
+    [404.58, .20], [410.17, .17, 'Hδ 410.2', 3], [434.05, .30, 'Hγ 434.0', 2], [438.35, .24], [440.48, .16],
+    [486.13, .58, 'Hβ 486.1', 1], [495.76, .14], [516.75, .22], [526.95, .46, 'Fe I 526.95', 1], [532.80, .28], [537.15, .22],
+    [656.28, 1.0, 'Hα 656.3', 0], [696.54, .30], [706.72, .26], [738.40, .36], [750.39, .60, 'Ar I 750.4', 2], [763.51, .66],
+    [772.40, .38], [794.82, .30], [801.48, .34], [811.53, .80, 'Ar I 811.5', 1], [842.46, .42]
+  ].map(function (a, i) {
+    return { l: a[0], a: a[1], label: a[2] || '', pri: a[3] == null ? 9 : a[3], f: 0.0011 + ((i * 7) % 11) * 0.00023, ph: i * 1.7 };
+  });
+  var labelled = lines.filter(function (l) { return l.label; }).sort(function (a, b) { return a.pri - b.pri; });
+
+  function rgb(l) {
+    var r = 0, g = 0, b = 0;
+    if (l < 440) { r = (440 - l) / 60; b = 1; }
+    else if (l < 490) { g = (l - 440) / 50; b = 1; }
+    else if (l < 510) { g = 1; b = (510 - l) / 20; }
+    else if (l < 580) { r = (l - 510) / 70; g = 1; }
+    else if (l < 645) { r = 1; g = (645 - l) / 65; }
+    else { r = 1; }
+    var f = l < 420 ? 0.45 + 0.55 * (l - 380) / 40 : l > 700 ? Math.max(0.42, 0.3 + 0.7 * (780 - l) / 80) : 1;
+    return Math.round(255 * r * f) + ',' + Math.round(255 * g * f) + ',' + Math.round(255 * b * f);
+  }
+  function size() {
+    var r = cv.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(240, Math.round(r.width)); H = Math.max(160, Math.round(r.height));
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  }
+  function draw(t) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    var padX = 16, axisH = 26, stripH = Math.round(H * 0.15);
+    var stripTop = H - axisH - stripH, base = stripTop - 12, top = 46, traceH = base - top;
+    var span = W - 2 * padX;
+    function X(l) { return padX + (l - L0) / (L1 - L0) * span; }
+    var flick = reduce ? 1 : 1 + 0.035 * Math.sin(t * 0.0019) + 0.025 * Math.sin(t * 0.0047 + 1.3);
+    var amps = lines.map(function (ln) { return ln.a * flick * (reduce ? 1 : 1 + 0.06 * Math.sin(t * ln.f + ln.ph)); });
+
+    // near-infrared region
+    var xn = X(750);
+    ctx.fillStyle = 'rgba(255,255,255,0.035)';
+    ctx.fillRect(xn, 0, W - xn, H - axisH);
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(padX, stripTop, span, stripH);
+
+    // spectrograph strip
+    ctx.globalCompositeOperation = 'lighter';
+    lines.forEach(function (ln, i) {
+      var x = X(ln.l), hw = 2.5 + amps[i] * 6, c = rgb(ln.l);
+      var g = ctx.createLinearGradient(x - hw, 0, x + hw, 0);
+      g.addColorStop(0, 'rgba(' + c + ',0)');
+      g.addColorStop(0.5, 'rgba(' + c + ',' + Math.min(1, 0.4 + amps[i] * 0.8) + ')');
+      g.addColorStop(1, 'rgba(' + c + ',0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - hw, stripTop, hw * 2, stripH);
+    });
+    ctx.globalCompositeOperation = 'source-over';
+
+    // intensity trace
+    var n = Math.round(span), w = Math.max(1.3, 1.6 * (L1 - L0) / n);
+    ctx.beginPath();
+    ctx.moveTo(padX, base);
+    for (var px = 0; px <= n; px++) {
+      var lam = L0 + px / n * (L1 - L0);
+      var v = 0.022 + (reduce ? 0.004 * Math.sin(px * 12.9898) : (Math.random() - 0.5) * 0.012);
+      for (var j = 0; j < lines.length; j++) { var d = (lam - lines[j].l) / w; v += amps[j] / (1 + d * d); }
+      ctx.lineTo(padX + px, base - Math.min(v, 1.1) / 1.1 * traceH);
+    }
+    ctx.lineTo(padX + n, base);
+    var fill = ctx.createLinearGradient(0, top, 0, base);
+    fill.addColorStop(0, 'rgba(233,238,243,0.20)'); fill.addColorStop(1, 'rgba(233,238,243,0.02)');
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.strokeStyle = '#E9EEF3'; ctx.lineWidth = 1.25; ctx.lineJoin = 'round'; ctx.stroke();
+
+    // line labels, placed by priority, skipped on collision
+    ctx.font = '600 15px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    var boxes = [], maxPri = W < 520 ? 1 : 3;
+    labelled.forEach(function (ln) {
+      if (ln.pri > maxPri) return;
+      var x = X(ln.l), y = base - Math.min(ln.a, 1.1) / 1.1 * traceH - 12;
+      var tw = ctx.measureText(ln.label).width, x0 = Math.max(4, Math.min(W - tw - 4, x - tw / 2));
+      var box = { x0: x0 - 4, x1: x0 + tw + 4, y0: y - 15, y1: y + 3 };
+      for (var k = 0; k < boxes.length; k++) {
+        var b = boxes[k];
+        if (box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0) return;
+      }
+      boxes.push(box);
+      ctx.fillStyle = '#E9EEF3';
+      ctx.fillText(ln.label, x0 + tw / 2, y);
+    });
+
+    // axis
+    ctx.font = '500 14px ' + FONT; ctx.fillStyle = 'rgba(233,238,243,0.72)'; ctx.strokeStyle = 'rgba(233,238,243,0.4)'; ctx.lineWidth = 1;
+    var step = W < 520 ? 100 : 50;
+    for (var lam2 = 400; lam2 <= 850; lam2 += step) {
+      var tx = Math.round(X(lam2)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(tx, H - axisH); ctx.lineTo(tx, H - axisH + 5); ctx.stroke();
+      var txt = lam2 >= 800 ? lam2 + ' nm' : String(lam2);
+      ctx.textAlign = lam2 >= 800 ? 'right' : 'center';
+      ctx.fillText(txt, lam2 >= 800 ? tx + 14 : tx, H - 7);
+    }
+    ctx.textAlign = 'left';
+    ctx.fillText('visible', padX, 22);
+    ctx.fillText('near infrared', xn + 8, 22);
+  }
+
+  var raf = 0, last = 0, onScreen = true;
+  function tick(t) { raf = requestAnimationFrame(tick); if (t - last < 70) return; last = t; draw(t); }
+  function start() { if (!raf && !reduce && onScreen && !document.hidden) raf = requestAnimationFrame(tick); }
+  function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+  function redraw() { size(); draw(performance.now()); }
+
+  redraw();
+  if (window.ResizeObserver) new ResizeObserver(redraw).observe(cv); else window.addEventListener('resize', redraw);
+  if (window.IntersectionObserver) new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; onScreen ? start() : stop(); }).observe(cv);
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(performance.now()); });
+  start();
+})();
+
+/* Contour map behind the outdoors section: marching squares over a small height field. */
+(function () {
+  var cv = document.getElementById('topo');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var peaks = [[0.10, 0.22, 1.0, 0.20], [0.52, 0.86, 0.85, 0.26], [0.88, 0.18, 0.95, 0.17], [0.74, 0.60, 0.5, 0.14], [0.30, 0.62, 0.45, 0.12]];
+  function draw() {
+    var r = cv.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height);
+    if (!W || !H) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    var cell = 9, cols = Math.ceil(W / cell) + 1, rows = Math.ceil(H / cell) + 1, asp = W / H;
+    var f = new Float32Array(cols * rows);
+    for (var j = 0; j < rows; j++) for (var i = 0; i < cols; i++) {
+      var u = i * cell / W, v = j * cell / H, s = 0;
+      for (var p = 0; p < peaks.length; p++) {
+        var dx = (u - peaks[p][0]) * Math.min(asp, 2.2), dy = v - peaks[p][1], sg = peaks[p][3];
+        s += peaks[p][2] * Math.exp(-(dx * dx + dy * dy) / (2 * sg * sg));
+      }
+      s += 0.07 * Math.sin(u * 9 + 1.2) * Math.cos(v * 6 - 0.4) + 0.045 * Math.sin(u * 17 - v * 11);
+      f[j * cols + i] = s;
+    }
+    function ip(a, b, L) { var d = b - a; return d === 0 ? 0.5 : (L - a) / d; }
+    var level = 0, idx = 0;
+    for (level = 0.12; level < 1.15; level += 0.075, idx++) {
+      ctx.beginPath();
+      for (var y = 0; y < rows - 1; y++) for (var x = 0; x < cols - 1; x++) {
+        var a = f[y * cols + x], b = f[y * cols + x + 1], c = f[(y + 1) * cols + x + 1], d = f[(y + 1) * cols + x];
+        var k = (a > level ? 8 : 0) | (b > level ? 4 : 0) | (c > level ? 2 : 0) | (d > level ? 1 : 0);
+        if (k === 0 || k === 15) continue;
+        var x0 = x * cell, y0 = y * cell;
+        var T = [x0 + ip(a, b, level) * cell, y0], R = [x0 + cell, y0 + ip(b, c, level) * cell];
+        var B = [x0 + ip(d, c, level) * cell, y0 + cell], Lf = [x0, y0 + ip(a, d, level) * cell];
+        var segs;
+        switch (k) {
+          case 1: case 14: segs = [[Lf, B]]; break;
+          case 2: case 13: segs = [[B, R]]; break;
+          case 3: case 12: segs = [[Lf, R]]; break;
+          case 4: case 11: segs = [[T, R]]; break;
+          case 6: case 9: segs = [[T, B]]; break;
+          case 7: case 8: segs = [[T, Lf]]; break;
+          case 5: segs = [[T, R], [Lf, B]]; break;
+          default: segs = [[T, Lf], [B, R]];
+        }
+        for (var q = 0; q < segs.length; q++) { ctx.moveTo(segs[q][0][0], segs[q][0][1]); ctx.lineTo(segs[q][1][0], segs[q][1][1]); }
+      }
+      var index = idx % 4 === 0;
+      ctx.strokeStyle = index ? 'rgba(196,224,186,0.34)' : 'rgba(196,224,186,0.17)';
+      ctx.lineWidth = index ? 1.4 : 1;
+      ctx.stroke();
+    }
+  }
+  draw();
+  if (window.ResizeObserver) new ResizeObserver(draw).observe(cv); else window.addEventListener('resize', draw);
+})();
+
+/* Lab videos: no autoplay for people who ask for reduced motion */
+(function () {
+  if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  document.querySelectorAll('.reel video').forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); v.controls = true; });
+})();
+
+/* Copy citation buttons */
+(function () {
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    var label = btn.textContent, timer = 0;
+    btn.addEventListener('click', function () {
+      function show(msg) { btn.textContent = msg; clearTimeout(timer); timer = setTimeout(function () { btn.textContent = label; }, 1800); }
+      try {
+        navigator.clipboard.writeText(btn.getAttribute('data-cite')).then(function () { show('Copied'); }, function () { show('Copy blocked. Use the link.'); });
+      } catch (e) { show('Copy blocked. Use the link.'); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
